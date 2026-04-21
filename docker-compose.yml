@@ -37,9 +37,6 @@ services:
       - traefik.http.routers.draw-api.entrypoints=https
       - traefik.http.routers.draw-api.tls.certresolver=letsencrypt
       - traefik.http.services.draw-api.loadbalancer.server.port=${BACKEND_PORT}
-    networks:
-      - default
-      - traefik
 
   frontend:
     build:
@@ -55,9 +52,6 @@ services:
       - traefik.http.routers.draw-web.entrypoints=https
       - traefik.http.routers.draw-web.tls.certresolver=letsencrypt
       - traefik.http.services.draw-web.loadbalancer.server.port=4173
-    networks:
-      - default
-      - traefik
 
   # Realtime collaboration via Yjs WebSocket server (y-websocket)
   # Kept as "excalidraw-room" service name per requirement.
@@ -74,14 +68,8 @@ services:
       - traefik.http.routers.draw-ws.entrypoints=https
       - traefik.http.routers.draw-ws.tls.certresolver=letsencrypt
       - traefik.http.services.draw-ws.loadbalancer.server.port=1234
-    networks:
-      - default
-      - traefik
 
 volumes:
   postgres_data:
 
-networks:
-  traefik:
-    external: true
 
