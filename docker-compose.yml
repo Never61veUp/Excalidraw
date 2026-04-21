@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   postgres:
     image: postgres:16-alpine
@@ -23,11 +25,21 @@ services:
       DATABASE_URL: ${DATABASE_URL}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+      CORS_ORIGIN: ${CORS_ORIGIN}
     depends_on:
       postgres:
         condition: service_healthy
     expose:
       - "${BACKEND_PORT}"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.draw-api.rule=Host(`api.draw.mixdev.me`)
+      - traefik.http.routers.draw-api.entrypoints=https
+      - traefik.http.routers.draw-api.tls.certresolver=letsencrypt
+      - traefik.http.services.draw-api.loadbalancer.server.port=${BACKEND_PORT}
+    networks:
+      - default
+      - traefik
 
   frontend:
     build:
@@ -37,20 +49,15 @@ services:
       VITE_WS_BASE_URL: ${VITE_WS_BASE_URL}
     expose:
       - "4173"
-
-  nginx:
-    image: nginx:1.27-alpine
-    depends_on:
-      - frontend
-      - backend
-      - excalidraw-room
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.nginx.rule=PathPrefix(`/`)"
-      - "traefik.http.routers.nginx.entrypoints=web"
-      - "traefik.http.services.nginx.loadbalancer.server.port=80"
+      - traefik.enable=true
+      - traefik.http.routers.draw-web.rule=Host(`draw.mixdev.me`)
+      - traefik.http.routers.draw-web.entrypoints=https
+      - traefik.http.routers.draw-web.tls.certresolver=letsencrypt
+      - traefik.http.services.draw-web.loadbalancer.server.port=4173
+    networks:
+      - default
+      - traefik
 
   # Realtime collaboration via Yjs WebSocket server (y-websocket)
   # Kept as "excalidraw-room" service name per requirement.
@@ -61,19 +68,20 @@ services:
       PORT: 1234
     expose:
       - "1234"
-
-  traefik:
-    image: traefik:v3.1
-    command:
-      - "--api.dashboard=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-    ports:
-      - "80:80"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.draw-ws.rule=Host(`ws.draw.mixdev.me`)
+      - traefik.http.routers.draw-ws.entrypoints=https
+      - traefik.http.routers.draw-ws.tls.certresolver=letsencrypt
+      - traefik.http.services.draw-ws.loadbalancer.server.port=1234
+    networks:
+      - default
+      - traefik
 
 volumes:
   postgres_data:
+
+networks:
+  traefik:
+    external: true
 

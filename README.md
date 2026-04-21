@@ -74,7 +74,9 @@ cp .env.example .env
 
 - `POSTGRES_PASSWORD`
 - `JWT_SECRET`
-- `TRAEFIK_DOMAIN` (если будете добавлять HTTPS позже)
+- `CORS_ORIGIN=https://draw.mixdev.me`
+- `VITE_API_BASE_URL=https://api.draw.mixdev.me`
+- `VITE_WS_BASE_URL=wss://ws.draw.mixdev.me`
 
 3) Поднимите сервисы:
 
