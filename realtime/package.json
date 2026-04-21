@@ -1,0 +1,14 @@
+{
+  "name": "excalidraw-room",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "HOST=0.0.0.0 PORT=1234 npx y-websocket"
+  },
+  "dependencies": {
+    "@y/websocket-server": "^0.1.1",
+    "y-websocket": "^3.0.0",
+    "yjs": "^13.6.27"
+  }
+}
+
