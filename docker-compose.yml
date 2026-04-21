@@ -21,7 +21,7 @@ services:
       context: ./backend
     environment:
       NODE_ENV: production
-      PORT: ${BACKEND_PORT}
+      PORT: 8080
       DATABASE_URL: ${DATABASE_URL}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
@@ -30,13 +30,13 @@ services:
       postgres:
         condition: service_healthy
     expose:
-      - "${BACKEND_PORT}"
+      - 8080
     labels:
       - traefik.enable=true
       - traefik.http.routers.draw-api.rule=Host(`api.draw.mixdev.me`)
       - traefik.http.routers.draw-api.entrypoints=https
       - traefik.http.routers.draw-api.tls.certresolver=letsencrypt
-      - traefik.http.services.draw-api.loadbalancer.server.port=${BACKEND_PORT}
+      - traefik.http.services.draw-api.loadbalancer.server.port=8080
 
   frontend:
     build:
